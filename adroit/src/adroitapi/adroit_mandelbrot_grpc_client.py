@@ -3,7 +3,6 @@ import logging
 import multiprocessing
 
 from adroit_coding_challenge.server.adroit_grpc_server import AdroitServer
-from adroit_coding_challenge.client.adroit_grpc_client import AdroitClient
 from adroit_coding_challenge.protos import Mandelbrot_pb2
 from my_adroit_client import MyAdroitClient
 
@@ -24,7 +23,13 @@ def compute_mandelbrot_point_example(
     if client is None:
         client = MyAdroitClient("localhost", port=50051)
 
-    return client.compute_mandelbrot_point(real, imaginary, max_iterations)
+    result = client.compute_mandelbrot_point(real, imaginary, max_iterations)
+    assert isinstance(result, Mandelbrot_pb2.MandelbrotPoint)
+    assert result.value.real is not None, "real component missing"
+    assert result.value.imaginary is not None, "imaginary component missing"
+    assert result.iterations >= 0, "iterations should be non-negative"
+
+    return result
 
 
 def generate_mandelbrot_example(
@@ -49,7 +54,7 @@ def generate_mandelbrot_example(
     if client is None:
         client = MyAdroitClient("localhost", port=50051)
 
-    return client.generate_mandelbrot(
+    result = client.generate_mandelbrot(
         width,
         height,
         corner1_real,
@@ -58,6 +63,11 @@ def generate_mandelbrot_example(
         corner2_imaginary,
         max_iterations,
     )
+    assert isinstance(result, Mandelbrot_pb2.MandelbrotResults)
+    assert result.resolution.x == width, "resolution x mismatch"
+    assert result.resolution.y == height, "resolution y mismatch"
+
+    return result
 
 
 def generate_mandelbrot_stream_example(
@@ -82,7 +92,7 @@ def generate_mandelbrot_stream_example(
     if client is None:
         client = MyAdroitClient("localhost", port=50051)
 
-    return client.generate_mandelbrot_stream(
+    pixels = client.generate_mandelbrot_stream(
         width,
         height,
         corner1_real,
@@ -91,6 +101,15 @@ def generate_mandelbrot_stream_example(
         corner2_imaginary,
         max_iterations,
     )
+    assert isinstance(pixels, list), "pixels should be a list"
+
+    if pixels:
+        assert isinstance(
+            pixels[0], Mandelbrot_pb2.MandelbrotPixel
+        ), "first pixel is not MandelbrotPixel"
+        assert pixels[0].position.x >= 0, "invalid pixel x coordinate"
+
+    return pixels
 
 
 async def run_examples():

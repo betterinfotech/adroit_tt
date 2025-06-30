@@ -32,6 +32,9 @@ class MyAdroitClient(AdroitClient):
             ),
             max_iterations=max_iterations,
         )
+        assert request.point.real is not None
+        assert request.max_iterations > 0
+
         return self.stub.ComputeMandelbrotPoint(request)
 
     def generate_mandelbrot(
