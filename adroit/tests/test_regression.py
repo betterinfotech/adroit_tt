@@ -1,0 +1,31 @@
+# Regression test to make sure gRPC client works.
+
+from multiprocessing import Process
+import asyncio
+from adroit_coding_challenge.server.adroit_grpc_server import AdroitServer
+from adroit_coding_challenge.client.adroit_grpc_client import AdroitClient
+from adroitapi.my_adroit_client import MyAdroitClient
+from adroit_coding_challenge.protos import Mandelbrot_pb2
+
+
+def run_server():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    server = AdroitServer("TestServer", port=50051)
+    loop.run_until_complete(server.serve())
+
+
+def test_basic_mandelbrot():
+    p = Process(target=run_server)
+    p.start()
+
+    # client = AdroitClient("localhost", port=50051)
+    client = MyAdroitClient("localhost", port=50051)
+    result = client.compute_mandelbrot_point(0.0, 0.0, 20)
+
+    assert isinstance(result, Mandelbrot_pb2.MandelbrotPoint)
+    assert float(result.value.real) == 0.0
+    assert float(result.value.imaginary) == 0.0
+
+    p.terminate()
+    p.join()
