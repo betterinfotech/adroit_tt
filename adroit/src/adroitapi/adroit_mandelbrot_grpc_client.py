@@ -5,14 +5,7 @@ import multiprocessing
 from adroit_coding_challenge.server.adroit_grpc_server import AdroitServer
 from adroit_coding_challenge.client.adroit_grpc_client import AdroitClient
 from adroit_coding_challenge.protos import Mandelbrot_pb2
-from adroit_coding_challenge.protos import Mandelbrot_pb2_grpc
-
-
-# TODO
-#  Define a derived class of AdroitClient which implements the following gRPC endpoint:
-#  - ComputeMandelbrotPoint
-#  - GenerateMandelbrot
-#  - GenerateMandelbrotStream
+from my_adroit_client import MyAdroitClient
 
 
 def compute_mandelbrot_point_example(
@@ -21,12 +14,10 @@ def compute_mandelbrot_point_example(
     imaginary: float = 0.0,
     max_iterations: int = 20,
 ) -> Mandelbrot_pb2.MandelbrotPoint:
-    # TODO
-    #  Implement a method which acts as a driver method for client.compute_mandelbrot_point
-    #  This function should:
-    #  - Handle the request formation
-    #  - Return the response data
-    raise NotImplementedError
+    if client is None:
+        client = MyAdroitClient("localhost", port=50051)
+
+    return client.compute_mandelbrot_point(real, imaginary, max_iterations)
 
 
 def generate_mandelbrot_example(
@@ -41,12 +32,18 @@ def generate_mandelbrot_example(
     corner2_imaginary: float = 0.25,
     max_iterations: int = 20,
 ) -> Mandelbrot_pb2.MandelbrotResults:
-    # TODO
-    #  Implement a method which acts as a driver method for client.generate_mandelbrot
-    #  This function should:
-    #  - Handle the request formation
-    #  - Return the response data
-    raise NotImplementedError
+    if client is None:
+        client = MyAdroitClient("localhost", port=50051)
+
+    return client.generate_mandelbrot(
+        width,
+        height,
+        corner1_real,
+        corner1_imaginary,
+        corner2_real,
+        corner2_imaginary,
+        max_iterations,
+    )
 
 
 def generate_mandelbrot_stream_example(
@@ -61,14 +58,18 @@ def generate_mandelbrot_stream_example(
     corner2_imaginary: float = 0.25,
     max_iterations: int = 20,
 ) -> list[Mandelbrot_pb2.MandelbrotPixel]:
-    # TODO
-    #  Implement a method which acts as a driver method for client.generate_mandelbrot_stream
-    #  This function should:
-    #  - Handle the request formation
-    #  - Queue handling
-    #  - Return all of the data from the queue
-    #  Reminder: You may define and use a helper function, if necessary.
-    raise NotImplementedError
+    if client is None:
+        client = MyAdroitClient("localhost", port=50051)
+
+    return client.generate_mandelbrot_stream(
+        width,
+        height,
+        corner1_real,
+        corner1_imaginary,
+        corner2_real,
+        corner2_imaginary,
+        max_iterations,
+    )
 
 
 async def run_examples():
@@ -87,10 +88,10 @@ def run_server(stop_after_seconds: int = 5):
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    logging.getLogger().info(f"Server initialization starting.")
+    logging.getLogger().info("Server initialization starting.")
     server_process = multiprocessing.Process(target=run_server)
     server_process.start()
 
-    run_examples()
+    asyncio.run(run_examples())
 
     server_process.join()

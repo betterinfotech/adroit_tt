@@ -3,7 +3,6 @@
 from multiprocessing import Process
 import asyncio
 from adroit_coding_challenge.server.adroit_grpc_server import AdroitServer
-from adroit_coding_challenge.client.adroit_grpc_client import AdroitClient
 from adroitapi.my_adroit_client import MyAdroitClient
 from adroit_coding_challenge.protos import Mandelbrot_pb2
 
