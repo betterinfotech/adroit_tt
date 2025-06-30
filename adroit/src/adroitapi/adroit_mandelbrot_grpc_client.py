@@ -9,7 +9,7 @@ from my_adroit_client import MyAdroitClient
 
 
 def compute_mandelbrot_point_example(
-    client: AdroitClient = None,
+    client: MyAdroitClient | None = None,
     real: float = 0.0,
     imaginary: float = 0.0,
     max_iterations: int = 20,
@@ -28,7 +28,7 @@ def compute_mandelbrot_point_example(
 
 
 def generate_mandelbrot_example(
-    client: AdroitClient = None,
+    client: MyAdroitClient | None = None,
     width: int = 40,  # corresponds to resolution.x
     height: int = 20,  # corresponds to resolution.y
     # first corner for a bounding box
@@ -61,7 +61,7 @@ def generate_mandelbrot_example(
 
 
 def generate_mandelbrot_stream_example(
-    client: AdroitClient = None,
+    client: MyAdroitClient | None = None,
     width: int = 40,  # corresponds to resolution.x
     height: int = 20,  # corresponds to resolution.y
     # first corner for a bounding box
