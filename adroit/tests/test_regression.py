@@ -1,4 +1,8 @@
-# Regression test to make sure gRPC client works.
+"""
+Regression tests for the Mandelbrot gRPC server implementation.
+These tests verify that existing endpoints continue to function correctly
+and that backward compatibility is preserved while extending functionality.
+"""
 
 from multiprocessing import Process
 import asyncio
@@ -8,6 +12,9 @@ from adroit_coding_challenge.protos import Mandelbrot_pb2
 
 
 def run_server():
+    """
+    Used to launch the gRPC server in a separate process.
+    """
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     server = AdroitServer("TestServer", port=50051)
@@ -15,6 +22,11 @@ def run_server():
 
 
 def test_basic_mandelbrot():
+    """
+    Regression test for compute_mandelbrot_point functionality.
+    Starts the server, sends a request to compute a Mandelbrot point,
+    and validates that the response structure is correct.
+    """
     p = Process(target=run_server)
     p.start()
 

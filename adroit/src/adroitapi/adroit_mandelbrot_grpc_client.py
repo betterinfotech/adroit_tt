@@ -14,6 +14,13 @@ def compute_mandelbrot_point_example(
     imaginary: float = 0.0,
     max_iterations: int = 20,
 ) -> Mandelbrot_pb2.MandelbrotPoint:
+    """
+    Driver function to compute a single Mandelbrot point.
+
+    This function prepares a request to calculate the number of iterations for
+    a single complex point, then forwards it to the client’s gRPC call, and returns
+    the resulting MandelbrotPoint.
+    """
     if client is None:
         client = MyAdroitClient("localhost", port=50051)
 
@@ -32,6 +39,13 @@ def generate_mandelbrot_example(
     corner2_imaginary: float = 0.25,
     max_iterations: int = 20,
 ) -> Mandelbrot_pb2.MandelbrotResults:
+    """
+    Driver function to generate a Mandelbrot fractal over a defined area.
+
+    This function sets up a bounding box and resolution describing the fractal
+    area, forwards the request to the client, and returns the calculated
+    Mandelbrot results.
+    """
     if client is None:
         client = MyAdroitClient("localhost", port=50051)
 
@@ -58,6 +72,13 @@ def generate_mandelbrot_stream_example(
     corner2_imaginary: float = 0.25,
     max_iterations: int = 20,
 ) -> list[Mandelbrot_pb2.MandelbrotPixel]:
+    """
+    Driver function to generate Mandelbrot fractal pixel data using a stream.
+
+    This function requests a Mandelbrot stream from the server for the specified
+    bounding box and resolution, collects the streamed MandelbrotPixel messages
+    into a list, and returns them.
+    """
     if client is None:
         client = MyAdroitClient("localhost", port=50051)
 
@@ -73,6 +94,14 @@ def generate_mandelbrot_stream_example(
 
 
 async def run_examples():
+    """
+    Convenience coroutine to run all example driver functions sequentially.
+
+    This function demonstrates how to invoke the driver methods for:
+    - computing a single Mandelbrot point
+    - generating a Mandelbrot image
+    - streaming Mandelbrot pixels
+    """
     compute_mandelbrot_point_example()
     generate_mandelbrot_example()
     generate_mandelbrot_stream_example()
