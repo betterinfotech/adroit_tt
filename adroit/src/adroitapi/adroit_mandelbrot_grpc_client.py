@@ -3,34 +3,37 @@ import logging
 import multiprocessing
 
 from adroit_coding_challenge.server.adroit_grpc_server import AdroitServer
-from adroit_coding_challenge.client.adroit_grpc_client import AdroitClient
 from adroit_coding_challenge.protos import Mandelbrot_pb2
-from adroit_coding_challenge.protos import Mandelbrot_pb2_grpc
-
-
-# TODO
-#  Define a derived class of AdroitClient which implements the following gRPC endpoint:
-#  - ComputeMandelbrotPoint
-#  - GenerateMandelbrot
-#  - GenerateMandelbrotStream
+from my_adroit_client import MyAdroitClient
 
 
 def compute_mandelbrot_point_example(
-    client: AdroitClient = None,
+    client: MyAdroitClient | None = None,
     real: float = 0.0,
     imaginary: float = 0.0,
     max_iterations: int = 20,
 ) -> Mandelbrot_pb2.MandelbrotPoint:
-    # TODO
-    #  Implement a method which acts as a driver method for client.compute_mandelbrot_point
-    #  This function should:
-    #  - Handle the request formation
-    #  - Return the response data
-    raise NotImplementedError
+    """
+    Driver function to compute a single Mandelbrot point.
+
+    This function prepares a request to calculate the number of iterations for
+    a single complex point, then forwards it to the client’s gRPC call, and returns
+    the resulting MandelbrotPoint.
+    """
+    if client is None:
+        client = MyAdroitClient("localhost", port=50051)
+
+    result = client.compute_mandelbrot_point(real, imaginary, max_iterations)
+    assert isinstance(result, Mandelbrot_pb2.MandelbrotPoint)
+    assert result.value.real is not None, "Real component missing."
+    assert result.value.imaginary is not None, "Imaginary component missing."
+    assert result.iterations >= 0, "Iterations should be non-negative."
+
+    return result
 
 
 def generate_mandelbrot_example(
-    client: AdroitClient = None,
+    client: MyAdroitClient | None = None,
     width: int = 40,  # corresponds to resolution.x
     height: int = 20,  # corresponds to resolution.y
     # first corner for a bounding box
@@ -41,16 +44,34 @@ def generate_mandelbrot_example(
     corner2_imaginary: float = 0.25,
     max_iterations: int = 20,
 ) -> Mandelbrot_pb2.MandelbrotResults:
-    # TODO
-    #  Implement a method which acts as a driver method for client.generate_mandelbrot
-    #  This function should:
-    #  - Handle the request formation
-    #  - Return the response data
-    raise NotImplementedError
+    """
+    Driver function to generate a Mandelbrot fractal over a defined area.
+
+    This function sets up a bounding box and resolution describing the fractal
+    area, forwards the request to the client, and returns the calculated
+    Mandelbrot results.
+    """
+    if client is None:
+        client = MyAdroitClient("localhost", port=50051)
+
+    result = client.generate_mandelbrot(
+        width,
+        height,
+        corner1_real,
+        corner1_imaginary,
+        corner2_real,
+        corner2_imaginary,
+        max_iterations,
+    )
+    assert isinstance(result, Mandelbrot_pb2.MandelbrotResults)
+    assert result.resolution.x == width, "Resolution x mismatch."
+    assert result.resolution.y == height, "Resolution y mismatch."
+
+    return result
 
 
 def generate_mandelbrot_stream_example(
-    client: AdroitClient = None,
+    client: MyAdroitClient | None = None,
     width: int = 40,  # corresponds to resolution.x
     height: int = 20,  # corresponds to resolution.y
     # first corner for a bounding box
@@ -61,17 +82,45 @@ def generate_mandelbrot_stream_example(
     corner2_imaginary: float = 0.25,
     max_iterations: int = 20,
 ) -> list[Mandelbrot_pb2.MandelbrotPixel]:
-    # TODO
-    #  Implement a method which acts as a driver method for client.generate_mandelbrot_stream
-    #  This function should:
-    #  - Handle the request formation
-    #  - Queue handling
-    #  - Return all of the data from the queue
-    #  Reminder: You may define and use a helper function, if necessary.
-    raise NotImplementedError
+    """
+    Driver function to generate Mandelbrot fractal pixel data using a stream.
+
+    This function requests a Mandelbrot stream from the server for the specified
+    bounding box and resolution, collects the streamed MandelbrotPixel messages
+    into a list, and returns them.
+    """
+    if client is None:
+        client = MyAdroitClient("localhost", port=50051)
+
+    pixels = client.generate_mandelbrot_stream(
+        width,
+        height,
+        corner1_real,
+        corner1_imaginary,
+        corner2_real,
+        corner2_imaginary,
+        max_iterations,
+    )
+    assert isinstance(pixels, list), "Pixels should be a list."
+
+    if pixels:
+        assert isinstance(
+            pixels[0], Mandelbrot_pb2.MandelbrotPixel
+        ), "first pixel is not MandelbrotPixel"
+        assert pixels[0].position.x >= 0, "Invalid pixel x coordinate."
+
+    return pixels
 
 
 async def run_examples():
+    """
+    Convenience function to run all example driver functions sequentially.
+
+    This function demonstrates how to invoke the driver methods for:
+    - Computing a single Mandelbrot point
+    - Generating a Mandelbrot image
+    - Streaming Mandelbrot pixels
+    """
     compute_mandelbrot_point_example()
     generate_mandelbrot_example()
     generate_mandelbrot_stream_example()
@@ -87,10 +136,10 @@ def run_server(stop_after_seconds: int = 5):
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
-    logging.getLogger().info(f"Server initialization starting.")
+    logging.getLogger().info("Server initialization starting.")
     server_process = multiprocessing.Process(target=run_server)
     server_process.start()
 
-    run_examples()
+    asyncio.run(run_examples())
 
     server_process.join()
