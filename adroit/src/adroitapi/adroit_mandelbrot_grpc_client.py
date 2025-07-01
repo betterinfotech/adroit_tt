@@ -25,9 +25,9 @@ def compute_mandelbrot_point_example(
 
     result = client.compute_mandelbrot_point(real, imaginary, max_iterations)
     assert isinstance(result, Mandelbrot_pb2.MandelbrotPoint)
-    assert result.value.real is not None, "real component missing"
-    assert result.value.imaginary is not None, "imaginary component missing"
-    assert result.iterations >= 0, "iterations should be non-negative"
+    assert result.value.real is not None, "Real component missing."
+    assert result.value.imaginary is not None, "Imaginary component missing."
+    assert result.iterations >= 0, "Iterations should be non-negative."
 
     return result
 
@@ -64,8 +64,8 @@ def generate_mandelbrot_example(
         max_iterations,
     )
     assert isinstance(result, Mandelbrot_pb2.MandelbrotResults)
-    assert result.resolution.x == width, "resolution x mismatch"
-    assert result.resolution.y == height, "resolution y mismatch"
+    assert result.resolution.x == width, "Resolution x mismatch."
+    assert result.resolution.y == height, "Resolution y mismatch."
 
     return result
 
@@ -101,25 +101,25 @@ def generate_mandelbrot_stream_example(
         corner2_imaginary,
         max_iterations,
     )
-    assert isinstance(pixels, list), "pixels should be a list"
+    assert isinstance(pixels, list), "Pixels should be a list."
 
     if pixels:
         assert isinstance(
             pixels[0], Mandelbrot_pb2.MandelbrotPixel
         ), "first pixel is not MandelbrotPixel"
-        assert pixels[0].position.x >= 0, "invalid pixel x coordinate"
+        assert pixels[0].position.x >= 0, "Invalid pixel x coordinate."
 
     return pixels
 
 
 async def run_examples():
     """
-    Convenience coroutine to run all example driver functions sequentially.
+    Convenience function to run all example driver functions sequentially.
 
     This function demonstrates how to invoke the driver methods for:
-    - computing a single Mandelbrot point
-    - generating a Mandelbrot image
-    - streaming Mandelbrot pixels
+    - Computing a single Mandelbrot point
+    - Generating a Mandelbrot image
+    - Streaming Mandelbrot pixels
     """
     compute_mandelbrot_point_example()
     generate_mandelbrot_example()

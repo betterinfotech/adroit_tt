@@ -18,18 +18,17 @@ in order to be consistent with the APIs we use e.g. Color not Colour
 
 
 ## Substantive
-For more substantive things, the priorities we have [here](Priorities.md) influence
+For more substantive things, the priorities we have [here](Priorities.md) influences
 coding style a lot:
 
 - **Very high test coverage** on paths affecting correctness, with a variety of
   testing strategies e.g. regression and unit testing
 
-  
 - **Use of assertions** to ensure correctness and help with local reasoning.
   If you are making an assumption that isn’t guaranteed locally, use assert.
 
 - **Extensive use of static typing** to help with correctness and
-  refactorings (in ``src``, not required in ``tests``). We run ``pyright src``
+  refactorings (in src, not required in tests). We run "pyright src"
   and require zero errors.
 
   See [these notes](Static typing.md) for more information.
@@ -37,7 +36,10 @@ coding style a lot:
 
 ## Comments
 - We make extensive use of Docstrings and comments to capture knowledge about requirements.
-  Requirements have often not been defined explicitly.
-
-  If the syntax highlighting in your editor de-emphasises comments, as many tend
+- If the syntax highlighting in your editor de-emphasises comments, as many tend
   to do, that will be **very unhelpful**, and you will miss many things.
+
+## LLMs
+- ChatGPT is pretty good at writing code, especially when you ask them to write standalone scripts.
+- Some of the results are stuck around Python 3.9 and need to be checked.
+- Overall, its use for programming support is encouraged.

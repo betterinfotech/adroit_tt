@@ -2,7 +2,7 @@
 
 The test suite is run using [pytest](https://docs.pytest.org/en/stable/)
 
-  pytest tests/
+  "pytest tests/"
 
 Pytest has many features and extensive documentation that will enable you to use
 it much more effectively - for example by only running a subset of the tests.
@@ -23,10 +23,10 @@ We use regression tests to make sure a change does not inadvertently break code 
 
 We also require pyright checks to pass.
 
-pyright src
+"pyright src"
 
 ## Lint checks
 
 We also require ruff checks to pass.
 
-ruff check .
+"ruff check ."
